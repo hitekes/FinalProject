@@ -41,7 +41,6 @@ public class CarTimsortProgramm {
                     break;
                 case 5:
                     sortStrategy.sort(dataManager.getArray(), Car::compareTo);
-                    //dataManager.sortCars();
                     break;
                 case 6:
                     dataManager.clearData();

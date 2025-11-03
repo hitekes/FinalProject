@@ -3,7 +3,6 @@ package src.sort;
 import java.util.Comparator;
 
 public class BinaryInsertionSorter<T>  {
-
     public void sort(T[] array, Comparator<T> comparator, int start, int end) {
         for (int i = start+1; i <= end; i++) {
             T item = array[i];
