@@ -1,8 +1,11 @@
+import src.sort.SortStrategia;
+
 import java.util.Scanner;
 
 public class CarTimsortProgramm {
     private final CarDataManager dataManager;
     private final Scanner scanner;
+    SortStrategia<Car> sortStrategy = new SortStrategia<Car>(new TimSorter<Car>());
 
     public CarTimsortProgramm() {
         this.scanner = new Scanner(System.in);
@@ -37,7 +40,8 @@ public class CarTimsortProgramm {
                     dataManager.displayCars();
                     break;
                 case 5:
-                    dataManager.sortCars();
+                    sortStrategy.sort(dataManager.getArray(), Car::compareTo);
+                    //dataManager.sortCars();
                     break;
                 case 6:
                     dataManager.clearData();
