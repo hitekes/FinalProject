@@ -1,3 +1,8 @@
+package src.manager;
+
+import src.entity.Car;
+import src.util.InputValidator;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,7 +14,6 @@ import java.util.Scanner;
 public class CarDataManager {
     private final List<Car> cars = new ArrayList<>();
     private final Scanner scanner;
-    private final SortingStrategy<Car> sortingStrategy = new TimSortStrategy<>();
 
     public CarDataManager(Scanner scanner) {
         this.scanner = scanner;
@@ -40,7 +44,7 @@ public class CarDataManager {
                     String model = parts[1].trim();
                     int year = Integer.parseInt(parts[2].trim());
                     if (InputValidator.validateCarData(power, model, year)) {
-                        Car car = new Car.Builder()
+                        Car car = new Car.CarBuilder()
                                 .setPower(power)
                                 .setModel(model)
                                 .setYear(year)
@@ -53,8 +57,8 @@ public class CarDataManager {
                         System.out.println("Ошибка валидации в строке " + lineNum + ": " + line);
                         errorCount++;
                     }
-                } catch (NumberFormatException ex) {
-                    System.out.println("Ошибка числового формата в строке " + lineNum + ": " + line);
+                } catch (IllegalArgumentException ex) {
+                    System.out.println("Ошибка в строке " + lineNum + ": " + line + " - " + ex.getMessage());
                     errorCount++;
                 }
             }
@@ -71,7 +75,7 @@ public class CarDataManager {
     }
 
     private String[] splitFlexible(String line) {
-        String[] parts = line.split("[;,]\s*", -1);
+        String[] parts = line.split("[;,]\\s*", -1);
         if (parts.length == 1) {
             parts = line.split("\t", -1);
         }
@@ -85,10 +89,18 @@ public class CarDataManager {
         int count = InputValidator.getValidatedInt(scanner, "Сколько машин сгенерировать? ", 1, 10000);
         Random rnd = new Random();
         for (int i = 0; i < count; i++) {
-            int power = 50 + rnd.nextInt(1951);
+            int power = 50 + rnd.nextInt(950);
             String model = randomModel(rnd);
-            int year = 1990 + rnd.nextInt(36);
-            cars.add(new Car.Builder().setPower(power).setModel(model).setYear(year).build());
+            int year = 1990 + rnd.nextInt(35);
+            try {
+                cars.add(new Car.CarBuilder()
+                        .setPower(power)
+                        .setModel(model)
+                        .setYear(year)
+                        .build());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка при генерации машины: " + e.getMessage());
+            }
         }
         System.out.println("Сгенерировано " + count + " случайных машин.");
     }
@@ -102,37 +114,57 @@ public class CarDataManager {
     public void enterManualData() {
         System.out.println("Введите данные машины");
         while (true) {
-            int power = InputValidator.getValidatedInt(scanner, "Мощность: ", 50, 2000);
-            System.out.print("Модель: ");
-            String model = scanner.nextLine().trim();
-            int year = InputValidator.getValidatedInt(scanner, "Год производства: ", 1900, 2100);
-            if (InputValidator.validateCarData(power, model, year)) {
-                cars.add(new Car.Builder().setPower(power).setModel(model).setYear(year).build());
+            try {
+                int power = InputValidator.getValidatedInt(scanner, "Мощность: ", 50, 1000);
+                System.out.print("Модель: ");
+                String model = scanner.nextLine().trim();
+                int year = InputValidator.getValidatedInt(scanner, "Год производства: ", 1990, 2025);
+
+                Car car = new Car.CarBuilder()
+                        .setPower(power)
+                        .setModel(model)
+                        .setYear(year)
+                        .build();
+                cars.add(car);
                 System.out.println("Машина добавлена!");
-            } else {
-                System.out.println("Данные не прошли валидацию.");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка: " + e.getMessage());
             }
+
             System.out.print("Хотите добавить ещё машину? (да/нет): ");
             String answer = scanner.nextLine().trim().toLowerCase();
-            if (!(answer.equals("да"))) {
+            if (!answer.equals("да")) {
                 break;
             }
         }
+    }
 
-
-        public void displayCars () {
-            if (cars.isEmpty()) {
-                System.out.println("Список машин пуст.");
-                return;
-            }
-            System.out.println("\nСПИСОК МАШИН (" + cars.size() + " шт.):");
-            System.out.println("=".repeat(65));
-            System.out.printf("%-3s %-40s %-12s %s\n", "№", "Модель", "Мощность", "Год");
-            System.out.println("-".repeat(65));
-            for (int i = 0; i < cars.size(); i++) {
-                Car car = cars.get(i);
-                System.out.printf("%-3d %-40s %-12d %d\n", i + 1, car.getModel(), car.getPower(), car.getYear());
-            }
+    public void displayCars() {
+        if (cars.isEmpty()) {
+            System.out.println("Список машин пуст.");
+            return;
         }
+        System.out.println("\nСПИСОК МАШИН (" + cars.size() + " шт.):");
+        System.out.println("=".repeat(65));
+        System.out.printf("%-3s %-40s %-12s %s\n", "№", "Модель", "Мощность", "Год");
+        System.out.println("-".repeat(65));
+        for (int i = 0; i < cars.size(); i++) {
+            Car car = cars.get(i);
+            System.out.printf("%-3d %-40s %-12d %d\n",
+                    i + 1, car.getModel(), car.getPower(), car.getYearOfProduction());
+        }
+    }
+
+    public void clearData() {
+        cars.clear();
+        System.out.println("Все данные очищены.");
+    }
+
+    public Car[] getArray() {
+        return cars.toArray(new Car[0]);
+    }
+
+    public List<Car> getCars() {
+        return new ArrayList<>(cars);
     }
 }

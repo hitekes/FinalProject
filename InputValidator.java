@@ -1,3 +1,5 @@
+package src.util;
+
 import java.util.Scanner;
 
 public final class InputValidator {
@@ -23,7 +25,6 @@ public final class InputValidator {
     public static boolean validateCarData(int power, String model, int year) {
         if (power < 50 || power > 2000) return false;
         if (model == null || model.trim().isEmpty() || model.length() > 100) return false;
-        if (year < 1900 || year > 2100) return false;
-        return true;
+        return year >= 1900 && year <= 2100;
     }
 }
