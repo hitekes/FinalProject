@@ -1,14 +1,15 @@
 package src.sort;
 
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Collection;
 
-public class TimSorter<T> implements Sorter<T>{
+
+public class TimSorter<T extends Comparable<T>> implements Sorter<T> {
     private static final int MIN_MERGE = 32;
     private BinaryInsertionSorter<T> binarySorter =  new BinaryInsertionSorter<>();
 
     @Override
-    public void sort(T[] array, Comparator<T> comparator) {
+    public void sort(T[] array) {
         if (array.length < 2) return;
 
         // реализация тимсорт
@@ -17,7 +18,7 @@ public class TimSorter<T> implements Sorter<T>{
         // сортируем вставками для маленьких подмассивов
         for (int i = 0; i < array.length; i += minRun) {
             int end = Math.min(i + minRun - 1, array.length - 1);
-            binarySorter.sort(array, comparator, i, end);
+            binarySorter.sort(array, i, end);
         }
 
         // слияние отсортированных подмассивов
@@ -27,7 +28,7 @@ public class TimSorter<T> implements Sorter<T>{
                 int right = Math.min(left + 2 * size - 1, array.length - 1);
 
                 if (mid < right) {
-                    merge(array, left, mid, right, comparator);
+                    merge(array, left, mid, right);
                 }
             }
         }
@@ -42,14 +43,14 @@ public class TimSorter<T> implements Sorter<T>{
         return n + r;
     }
 
-    private void merge(T[] array, int left, int mid, int right, Comparator<T> comparator) {
+    private void merge(T[] array, int left, int mid, int right) {
         T[] leftArray = Arrays.copyOfRange(array, left, mid + 1);
         T[] rightArray = Arrays.copyOfRange(array, mid + 1, right + 1);
 
         int i = 0, j = 0, k = left;
 
         while (i < leftArray.length && j < rightArray.length) {
-            if (comparator.compare(leftArray[i], rightArray[j]) <= 0) {
+            if (leftArray[i].compareTo(rightArray[j]) <= 0) {
                 array[k++] = leftArray[i++];
             } else {
                 array[k++] = rightArray[j++];
