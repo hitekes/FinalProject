@@ -22,7 +22,6 @@ public class CarDataManager {
     public void loadFromFile() {
         System.out.print("Введите имя файла: ");
         String filename = scanner.nextLine().trim();
-        int limit = InputValidator.getValidatedInt(scanner, "Сколько машин загрузить? ", 1, 1000000);
 
         List<Car> loaded = new ArrayList<>();
         int errorCount = 0;
@@ -68,7 +67,7 @@ public class CarDataManager {
         }
 
         cars.addAll(loaded);
-        System.out.println("Загружено " + loaded.size() + " машин из файла (запрошено " + limit + ").");
+        System.out.println("Загружено " + loaded.size() + " машин из файла ");
         if (errorCount > 0) {
             System.out.println("Найдено ошибок: " + errorCount);
         }
