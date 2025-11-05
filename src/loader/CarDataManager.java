@@ -49,9 +49,6 @@ public class CarDataManager {
                                 .yearOfProduction(year)
                                 .build();
                         loaded.add(car);
-                        if (loaded.size() >= limit) {
-                            break;
-                        }
                     } else {
                         System.out.println("Ошибка валидации в строке " + lineNum + ": " + line);
                         errorCount++;
