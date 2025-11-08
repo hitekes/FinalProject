@@ -1,19 +1,19 @@
-package src.manager;
+package src.loader;
 
-import src.entity.Car;
-import src.util.InputValidator;
+import src.sort.SortingContext;
+import src.sort.TimSorter;
+import src.utils.InputValidator;
+import src.entiti.Car;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class CarDataManager {
     private final List<Car> cars = new ArrayList<>();
     private final Scanner scanner;
+    SortingContext<Car> sortStrategy = new SortingContext<Car>(new TimSorter<>());
 
     public CarDataManager(Scanner scanner) {
         this.scanner = scanner;
@@ -22,7 +22,6 @@ public class CarDataManager {
     public void loadFromFile() {
         System.out.print("Введите имя файла: ");
         String filename = scanner.nextLine().trim();
-        int limit = InputValidator.getValidatedInt(scanner, "Сколько машин загрузить? ", 1, 1000000);
 
         List<Car> loaded = new ArrayList<>();
         int errorCount = 0;
@@ -45,14 +44,11 @@ public class CarDataManager {
                     int year = Integer.parseInt(parts[2].trim());
                     if (InputValidator.validateCarData(power, model, year)) {
                         Car car = new Car.CarBuilder()
-                                .setPower(power)
-                                .setModel(model)
-                                .setYear(year)
+                                .power(power)
+                                .model(model)
+                                .yearOfProduction(year)
                                 .build();
                         loaded.add(car);
-                        if (loaded.size() >= limit) {
-                            break;
-                        }
                     } else {
                         System.out.println("Ошибка валидации в строке " + lineNum + ": " + line);
                         errorCount++;
@@ -68,7 +64,7 @@ public class CarDataManager {
         }
 
         cars.addAll(loaded);
-        System.out.println("Загружено " + loaded.size() + " машин из файла (запрошено " + limit + ").");
+        System.out.println("Загружено " + loaded.size() + " машин из файла ");
         if (errorCount > 0) {
             System.out.println("Найдено ошибок: " + errorCount);
         }
@@ -94,9 +90,9 @@ public class CarDataManager {
             int year = 1990 + rnd.nextInt(35);
             try {
                 cars.add(new Car.CarBuilder()
-                        .setPower(power)
-                        .setModel(model)
-                        .setYear(year)
+                        .power(power)
+                        .model(model)
+                        .yearOfProduction(year)
                         .build());
             } catch (IllegalArgumentException e) {
                 System.out.println("Ошибка при генерации машины: " + e.getMessage());
@@ -121,9 +117,9 @@ public class CarDataManager {
                 int year = InputValidator.getValidatedInt(scanner, "Год производства: ", 1990, 2025);
 
                 Car car = new Car.CarBuilder()
-                        .setPower(power)
-                        .setModel(model)
-                        .setYear(year)
+                        .power(power)
+                        .model(model)
+                        .yearOfProduction(year)
                         .build();
                 cars.add(car);
                 System.out.println("Машина добавлена!");
@@ -160,11 +156,11 @@ public class CarDataManager {
         System.out.println("Все данные очищены.");
     }
 
-    public Car[] getArray() {
-        return cars.toArray(new Car[0]);
-    }
-
-    public List<Car> getCars() {
-        return new ArrayList<>(cars);
+    public void sortCars() {
+        Car[] sortedArray = cars.toArray(new Car[0]);
+        sortStrategy.sort(sortedArray);
+        cars.clear();
+        cars.addAll(Arrays.asList(sortedArray));
     }
 }
+

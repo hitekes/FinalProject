@@ -1,19 +1,21 @@
-import src.sort.SortStrategia;
+package src.main;
+
+import src.loader.CarDataManager;
+import src.utils.InputValidator;
 
 import java.util.Scanner;
 
-public class CarTimsortProgramm {
+public class CarTimSorter {
     private final CarDataManager dataManager;
     private final Scanner scanner;
-    SortStrategia<Car> sortStrategy = new SortStrategia<Car>(new TimSorter<Car>());
 
-    public CarTimsortProgramm() {
+    public CarTimSorter() {
         this.scanner = new Scanner(System.in);
         this.dataManager = new CarDataManager(scanner);
     }
 
     public static void main(String[] args) {
-        CarTimsortProgramm program = new CarTimsortProgramm();
+        CarTimSorter program = new CarTimSorter();
         program.run();
     }
 
@@ -40,7 +42,7 @@ public class CarTimsortProgramm {
                     dataManager.displayCars();
                     break;
                 case 5:
-                    sortStrategy.sort(dataManager.getArray(), Car::compareTo);
+                    dataManager.sortCars();
                     break;
                 case 6:
                     dataManager.clearData();
